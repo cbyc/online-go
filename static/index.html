@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Play Go Online</title>
+    <script>
+function createNewGame() {
+    fetch('/games', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            const gameLink = document.createElement('a');
+            gameLink.href = `${window.location.origin}/games/${data.game_id}`;
+            gameLink.textContent = `${window.location.origin}/games/${data.game_id}`;
+            
+            const gameLinkMessage = document.createElement('p');
+            gameLinkMessage.textContent = `Your game link is: `;
+            gameLinkMessage.appendChild(gameLink);
+
+            document.body.appendChild(gameLinkMessage);
+        });
+}
+
+    </script>
+</head>
+<body>
+  <h1>Play Go Online</h1>
+  <br/><br/>
+  <button onclick="createNewGame()">Create a New Game</button>
+  <br/>
+</body>
+</html>

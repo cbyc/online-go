@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify, send_from_directory
 from collections import defaultdict
 import os
+import random
+import string
 
 app = Flask(__name__, static_folder='static')
 
@@ -26,6 +28,18 @@ def game_state(game_id):
 def reset_game(game_id):
     games[game_id] = [[None for _ in range(9)] for _ in range(9)]
     return '', 204  # No Content
+
+@app.route('/games', methods=['POST'])
+def new_game():
+    game_id = ''.join(random.choices(string.ascii_letters + string.digits, k=7))
+    while game_id in games:
+        game_id = ''.join(random.choices(string.ascii_letters + string.digits, k=7))
+    games[game_id] = [[None for _ in range(9)] for _ in range(9)]
+    return {'game_id': game_id}, 201  # Created
+
+@app.route('/index.html', methods=['GET'])
+def index():
+    return send_from_directory(app.static_folder, 'index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
