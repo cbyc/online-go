@@ -37,7 +37,7 @@ def new_game():
     games[game_id] = [[None for _ in range(9)] for _ in range(9)]
     return {'game_id': game_id}, 201  # Created
 
-@app.route('/index.html', methods=['GET'])
+@app.route('/', methods=['GET'])
 def index():
     return send_from_directory(app.static_folder, 'index.html')
 
