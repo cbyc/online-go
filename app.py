@@ -16,7 +16,7 @@ def game(game_id):
         games[game_id][x][y] = color
         return '', 204  # No Content
     else:
-        return send_from_directory(app.static_folder, 'index.html')
+        return send_from_directory(app.static_folder, 'board.html')
 
 @app.route('/games/<game_id>/state', methods=['GET'])
 def game_state(game_id):
