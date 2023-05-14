@@ -52,7 +52,7 @@
         <h1>Play Go</h1>
 
         <p>
-	  Choose your stone: <br/>
+          Choose your stone: <br />
           <input type="radio" id="black" name="color" value="black" />
           <label for="black">Black</label>
           <br />
@@ -61,6 +61,8 @@
         </p>
         <br />
         <p id="current-player"></p>
+        <br /><br />
+        <button onclick="undo()">Undo</button>
         <br /><br />
         <button id="reset-button">Reset game</button>
       </div>
@@ -184,6 +186,12 @@
             fetchGameState();
           }
         });
+      }
+
+      function undo() {
+        fetch(`/games/${gameId}/undo`, {
+          method: "POST",
+        }).then(fetchGameState);
       }
 
       document.getElementById("reset-button").onclick = function () {
