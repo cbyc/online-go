@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Go Game</title>
+
+    <style>
+      #main-container {
+        display: flex;
+        justify-content: space-between;
+      }
+      
+    #left-column {
+        flex: 0 0 120px;
+        padding: 10px;
+    }
+    
+    #right-column {
+        flex: 1;
+        padding: 10px;
+    }
+    
+    .board {
+        display: grid;
+        grid-template-columns: repeat(9, 1fr);
+        grid-template-rows: repeat(9, 1fr);
+        width: 80vw;
+        height: 80vw;
+        max-width: 80vh;
+        max-height: 80vh;
+        margin: 0 auto;
+        border: 0px solid black;
+    }
+    .cell {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+    }
+    .stone {
+        width: 100%;
+        height: 100%;
+    }
+    .cross {
+	width: 100%;
+        height: 100%;
+    }
+</style>
+
+
+</head>
+<body>
+
+
+  <div id="main-container">
+    <div id="left-column">
+  <h1>Play Go</h1>
+
+  <h3>
+   <input type="radio" id="black" name="color" value="black">
+   <label for="black">Black</label>
+   <br/>
+    <input type="radio" id="white" name="color" value="white">
+    <label for="white">White</label>
+  </h3>
+  <br/>
+  <button id="reset-button">Reset game</button>
+  </div>
+
+<div id="right-column">
+    <div id="board" class="board"></div>
+</div>
+</div>
+    
+    <script>
+        const gameId = location.pathname.split('/')[2];
+        let selectedCell;
+
+      // Fetch the initial game state
+      fetchGameState();
+
+      // Start polling the game state every second
+      setInterval(fetchGameState, 1000);
+
+      function fetchGameState() {
+	  fetch(`/games/${gameId}/state`)
+              .then(response => response.json())
+              .then(board => renderBoard(board));
+      }
+
+function renderBoard(board) {
+    const boardEl = document.getElementById('board');
+    boardEl.innerHTML = '';
+    board.forEach((row, x) => {
+        row.forEach((cell, y) => {
+            const cellEl = document.createElement('div');
+            cellEl.className = 'cell';
+            const img = document.createElement('img');
+            img.className = 'stone';
+            if (x === 0 && y === 0) {  // top-left cell
+		if (cell === 'black') img.src = '/static/tl_b.png';
+                else if (cell === 'white') img.src = '/static/tl_w.png';
+                else img.src = '/static/tl.png';
+	    } else if (x === 0 && y === 8) {  // top-right cell
+		if (cell === 'black') img.src = '/static/tr_b.png';
+                else if (cell === 'white') img.src = '/static/tr_w.png';
+                else img.src = '/static/tr.png';
+            } else if (x === 0) {  // top row
+		if (cell === 'black') img.src = '/static/t_b.png';
+                else if (cell === 'white') img.src = '/static/t_w.png';
+                else img.src = '/static/t.png';
+	    } else if (x < 8 && y === 0) {  // left
+		if (cell === 'black') img.src = '/static/l_b.png';
+                else if (cell === 'white') img.src = '/static/l_w.png';
+                else img.src = '/static/l.png';
+	    } else if (x < 8 && y === 8) {  // right
+		if (cell === 'black') img.src = '/static/r_b.png';
+                else if (cell === 'white') img.src = '/static/r_w.png';
+                else img.src = '/static/r.png';
+	    } else if (x < 8) {  // center
+		if (cell === 'black') img.src = '/static/c_b.png';
+                else if (cell === 'white') img.src = '/static/c_w.png';
+                else img.src = '/static/c.png';
+	    } else if (x === 8 && y === 0) {  // bottom-left
+		if (cell === 'black') img.src = '/static/bl_b.png';
+                else if (cell === 'white') img.src = '/static/bl_w.png';
+                else img.src = '/static/bl.png';
+	    } else if (x === 8 && y === 8) {  // bottom-right
+		if (cell === 'black') img.src = '/static/br_b.png';
+                else if (cell === 'white') img.src = '/static/br_w.png';
+                else img.src = '/static/br.png';
+	    } else if (x === 8) {  // bottom
+		if (cell === 'black') img.src = '/static/b_b.png';
+                else if (cell === 'white') img.src = '/static/b_w.png';
+                else img.src = '/static/b.png';
+            } 
+            cellEl.appendChild(img);
+            cellEl.onclick = () => selectCell(x, y);
+            boardEl.appendChild(cellEl);
+        });
+    });
+}
+
+
+      function selectCell(x, y) {
+	  const colorRadio = document.querySelector('input[name="color"]:checked');
+    if (!colorRadio) {
+        alert('Please select a color!');
+        return;
+    }
+            const color = colorRadio.value;
+            submitMove(color, x, y);
+        }
+
+       function submitMove(color, x, y) {
+    fetch(`/games/${gameId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ x, y, color }),
+    }).then(response => {
+        if (!response.ok) {
+            response.text().then(alert);
+        } else {
+            fetchGameState();
+        }
+    });
+       }
+
+      document.getElementById('reset-button').onclick = function() {
+    if (confirm('Are you sure you want to reset the game?')) {
+        fetch(`/games/${gameId}/reset`, {
+            method: 'POST',
+        }).then(fetchGameState);
+    }
+};
+
+
+    </script>
+</body>
+</html>
