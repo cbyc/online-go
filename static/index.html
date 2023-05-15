@@ -4,26 +4,48 @@
     <title>Play Go</title>
     <script>
       function createNewGame() {
-        fetch("/games", { method: "POST" })
+        const gameName = document.getElementById("gameName").value;
+        fetch("/games", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ game_name: gameName })
+        })
           .then((response) => response.json())
           .then((data) => {
-            const gameLink = document.createElement("a");
-            gameLink.href = `${window.location.origin}/games/${data.game_id}`;
-            gameLink.textContent = `${window.location.origin}/games/${data.game_id}`;
+            if (data.error) {
+		// alert(data.error);
+		const msg = document.getElementById("message");
+		msg.style.color = "red";
+		msg.innerHTML = "Game name already exists! Try a different name.";
+                msg.appendChild(gameLink);
 
-            const gameLinkMessage = document.createElement("p");
-            gameLinkMessage.textContent = `Your game link is: `;
-            gameLinkMessage.appendChild(gameLink);
+            } else {
+              const gameLink = document.createElement("a");
+              gameLink.href = `${window.location.origin}/games/${data.game_id}`;
+              gameLink.textContent = `${window.location.origin}/games/${data.game_id}`;
 
-            document.body.appendChild(gameLinkMessage);
+		const msg = document.getElementById("message");
+		msg.style.color = "black";
+		msg.innerHTML = "";
+		msg.textContent = `Your board link is: `;
+                msg.appendChild(gameLink);
+            }
           });
       }
     </script>
   </head>
   <body>
     <h1>Play Go</h1>
-    <br /><br />
-    <button onclick="createNewGame()">Create a New Game</button>
     <br />
+    <p>Emabrk on your <a href="https://en.wikipedia.org/wiki/Go_(game)" target="_blank">Go</a> journey today!</p>
+
+    <p>
+      Please enter a name for your personal board. You can use your board anytime. You don't need to create it again.<br/>
+    <input type="text" id="gameName" placeholder="Enter game name">
+    <button onclick="createNewGame()">Create My Board</button>
+    </p>
+    <p id="message"></p>
   </body>
 </html>

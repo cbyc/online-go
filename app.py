@@ -66,17 +66,13 @@ def reset_game(game_id):
 
 @app.route('/games', methods=['POST'])
 def new_game():
-    game_id = ''.join(random.choices(string.ascii_letters + string.digits,
-                                     k=7))
-    while game_id in games:
-        game_id = ''.join(
-            random.choices(string.ascii_letters + string.digits, k=7))
-    games[game_id] = {
-        "board": [[None for _ in range(9)] for _ in range(9)],
-        "current_player": "black",
-        "history": []
-    }
-    return {'game_id': game_id}, 201  # Created
+    game_name = request.json.get('game_name')
+    if game_name in games:
+        return {'error': 'Game name already exists'}, 400  # Bad Request
+    games[game_name] = {"board": [[None for _ in range(9)] for _ in range(9)], 
+                        "current_player": "black",
+                        "history": []}
+    return {'game_id': game_name}, 201  # Created
 
 
 @app.route('/', methods=['GET'])
